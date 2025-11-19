@@ -67,8 +67,9 @@ CREATE INDEX idx_conversations_vapi_call_id ON conversations(vapi_call_id);
 CREATE INDEX idx_conversations_created_at ON conversations(created_at);
 
 -- Insert test data for development
+-- Test credentials: email=test@echoai.com, password=TestPass123
 INSERT INTO users (email, password_hash, full_name, phone_number) VALUES
-('test@echoai.com', '$2b$10$K7L1OJ45/4Y2nIvhRVpCe.FGUCmG5JQ8X3N5hX1e2JO0c1F5E0F0W', 'Test User', '+1234567890');
+('test@echoai.com', '$2b$10$fsYoHsrOkfQXpGblZdrbde9JUGXgA6nAeeyGyCrIP0Afutr4aJSUO', 'Test User', '+1234567890');
 
 -- Get the test user ID and create sample goals
 INSERT INTO goals (user_id, title, description, category, status, created_from_voice) VALUES

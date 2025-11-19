@@ -1,0 +1,121 @@
+# Hackathon Voice AI MVP Workflow
+# Adaptive parallel execution for building voice AI applications in 6 hours
+# Author: BMad
+# Version: 1.0.0
+
+name: 'hackathon-voice-ai-mvp'
+description: 'Execute adaptive parallel workflow to build voice AI MVP (React Native/Expo + Node.js + Vapi + WhatsApp) in 6 hours with checkpoint-driven MVP delivery and requirement change adaptability.'
+author: 'BMad'
+
+# Paths
+installed_path: '{project-root}/.bmad/bmm/workflows/hackathon-voice-ai-mvp'
+instructions: '{installed_path}/instructions.md'
+validation: '{installed_path}/checklist.md'
+template: false  # Action workflow - no template needed
+
+# Critical variables from config
+config_source: '{project-root}/.bmad/bmm/config.yaml'
+output_folder: '{config_source}:output_folder'
+user_name: '{config_source}:user_name'
+communication_language: '{config_source}:communication_language'
+date: system-generated
+
+# Hackathon-specific configuration
+# These will be loaded from CLAUDE.md at runtime
+project_config_source: '{project-root}/CLAUDE.md'
+
+# Default execution parameters (overridable from CLAUDE.md)
+hackathon_duration: 6 hours
+target_platforms: ['iOS', 'Android', 'Web']
+approach: 'adaptive-hybrid'
+
+# Tech stack configuration (loaded from CLAUDE.md)
+tech_stack:
+  backend:
+    runtime: 'Node.js'
+    framework: 'Express'
+    database: 'PostgreSQL'
+    orm: 'Prisma'
+    auth: 'JWT'
+
+  frontend:
+    framework: 'React Native'
+    toolkit: 'Expo'
+    navigation: 'React Navigation'
+    state_management: 'Context API'
+
+  integrations:
+    voice_ai: 'Vapi'
+    messaging: 'WhatsApp via Pipedream'
+
+# Feature priority tiers (loaded from CLAUDE.md)
+features:
+  p0_must_have:
+    - jwt_authentication
+    - user_registration_login
+    - vapi_voice_integration
+    - goal_creation_from_voice
+    - basic_goal_display
+
+  p1_nice_to_have:
+    - whatsapp_conversation_summary
+    - goal_progress_tracking
+    - voice_conversation_history
+
+  p2_if_time:
+    - goal_reminders_via_whatsapp
+    - achievement_celebrations
+    - multi_goal_management
+
+# Execution phases
+phases:
+  foundation:
+    name: 'Foundation'
+    duration: 1
+    agents: 1
+    deliverable: 'Auth working + project scaffold'
+
+  parallel_features:
+    name: 'Parallel Features'
+    duration: 3
+    agents: 4
+    checkpoints: [30, 60, 90]  # minutes
+    deliverable: 'Backend APIs + Frontend screens + Vapi + WhatsApp integrated'
+
+  integration:
+    name: 'Integration & Demo'
+    duration: 2
+    agents: 1
+    deliverable: 'End-to-end flow working + demo script'
+
+# Checkpoint validation settings
+checkpoint_validation: true
+fallback_options: true
+requirement_change_adaptability: true
+
+# Output artifacts
+artifacts:
+  specs: '{output_folder}/hackathon/specs'
+  code_backend: '{project-root}/backend'
+  code_frontend: '{project-root}/mobile'
+  demo: '{output_folder}/hackathon/demo'
+  status: '{output_folder}/hackathon/status.md'
+
+# Agent prompts will be generated based on tech stack and features
+agent_prompt_templates: '{installed_path}/agent-templates'
+
+# Invocation control
+standalone: true
+
+# Web bundle configuration (for deployment to web environments)
+web_bundle:
+  name: 'hackathon-voice-ai-mvp'
+  description: 'Adaptive parallel hackathon workflow for voice AI MVPs'
+  author: 'BMad'
+  instructions: '.bmad/bmm/workflows/hackathon-voice-ai-mvp/instructions.md'
+  validation: '.bmad/bmm/workflows/hackathon-voice-ai-mvp/checklist.md'
+
+  web_bundle_files:
+    - '.bmad/bmm/workflows/hackathon-voice-ai-mvp/instructions.md'
+    - '.bmad/bmm/workflows/hackathon-voice-ai-mvp/checklist.md'
+    - '.bmad/bmm/workflows/hackathon-voice-ai-mvp/workflow.yaml'

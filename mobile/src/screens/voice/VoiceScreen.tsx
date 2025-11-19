@@ -9,35 +9,12 @@ import {
 } from 'react-native';
 import { colors } from '../../theme/colors';
 import { useAuth } from '../../contexts/AuthContext';
-import { useMockVapi } from '../../hooks/useMockVapi';
-
-// Mock emotion types
-const EMOTIONS = [
-  { name: 'Stressed', emoji: '😰', color: '#FF6B6B', coaching: 'CALM' },
-  { name: 'Anxious', emoji: '😟', color: '#FF6B6B', coaching: 'CALM' },
-  { name: 'Defeated', emoji: '😔', color: '#FFA500', coaching: 'PUSH' },
-  { name: 'Overwhelmed', emoji: '😓', color: '#FF6B6B', coaching: 'CALM' },
-  { name: 'Motivated', emoji: '💪', color: colors.primary, coaching: 'REINFORCE' },
-  { name: 'Calm', emoji: '😌', color: colors.success, coaching: 'REINFORCE' },
-  { name: 'Confident', emoji: '😎', color: colors.primary, coaching: 'REINFORCE' },
-];
+import { useVapi } from '../../hooks/useVapi';
 
 export default function VoiceScreen() {
   const { user } = useAuth();
-  const { status, error, startCall, stopCall, isCallActive, isConnecting } = useMockVapi();
-  const [detectedEmotion, setDetectedEmotion] = useState<typeof EMOTIONS[0] | null>(null);
+  const { status, error, startCall, stopCall, isCallActive, isConnecting, detectedEmotion } = useVapi();
   const [showWhatsAppUI, setShowWhatsAppUI] = useState(false);
-
-  // Mock emotion detection when call starts
-  useEffect(() => {
-    if (status === 'connected' && !detectedEmotion) {
-      // Simulate emotion detection after 2 seconds
-      setTimeout(() => {
-        const randomEmotion = EMOTIONS[Math.floor(Math.random() * EMOTIONS.length)];
-        setDetectedEmotion(randomEmotion);
-      }, 2000);
-    }
-  }, [status, detectedEmotion]);
 
   // Handle call end - show WhatsApp UI
   useEffect(() => {
@@ -54,7 +31,6 @@ export default function VoiceScreen() {
             {
               text: 'OK',
               onPress: () => {
-                setDetectedEmotion(null);
                 setShowWhatsAppUI(false);
               }
             }
@@ -68,7 +44,6 @@ export default function VoiceScreen() {
   useEffect(() => {
     if (error) {
       Alert.alert('Error', error);
-      setDetectedEmotion(null);
     }
   }, [error]);
 

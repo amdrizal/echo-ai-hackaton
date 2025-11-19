@@ -4,10 +4,10 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useAuth } from '../contexts/AuthContext';
 import { ActivityIndicator, View } from 'react-native';
 
-// Import screens (we'll create these next)
+// Import screens
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
-import GoalListScreen from '../screens/goals/GoalListScreen';
+import HistoryScreen from '../screens/history/HistoryScreen';
 import VoiceScreen from '../screens/voice/VoiceScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
 
@@ -33,14 +33,14 @@ function MainNavigator() {
       }}
     >
       <Tab.Screen
-        name="Goals"
-        component={GoalListScreen}
-        options={{ tabBarLabel: 'Goals' }}
-      />
-      <Tab.Screen
         name="Voice"
         component={VoiceScreen}
-        options={{ tabBarLabel: 'Voice Coach' }}
+        options={{ tabBarLabel: 'Voice Check' }}
+      />
+      <Tab.Screen
+        name="History"
+        component={HistoryScreen}
+        options={{ tabBarLabel: 'History' }}
       />
       <Tab.Screen
         name="Profile"

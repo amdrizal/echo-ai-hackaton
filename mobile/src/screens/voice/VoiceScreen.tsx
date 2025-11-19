@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,61 +9,82 @@ import {
 } from 'react-native';
 import { colors } from '../../theme/colors';
 import { useAuth } from '../../contexts/AuthContext';
-import { useGoals } from '../../contexts/GoalContext';
+import { useMockVapi } from '../../hooks/useMockVapi';
 
-// Note: Vapi integration will be completed with actual SDK
-// This is a placeholder structure for the hackathon
+// Mock emotion types
+const EMOTIONS = [
+  { name: 'Stressed', emoji: '😰', color: '#FF6B6B', coaching: 'CALM' },
+  { name: 'Anxious', emoji: '😟', color: '#FF6B6B', coaching: 'CALM' },
+  { name: 'Defeated', emoji: '😔', color: '#FFA500', coaching: 'PUSH' },
+  { name: 'Overwhelmed', emoji: '😓', color: '#FF6B6B', coaching: 'CALM' },
+  { name: 'Motivated', emoji: '💪', color: colors.primary, coaching: 'REINFORCE' },
+  { name: 'Calm', emoji: '😌', color: colors.success, coaching: 'REINFORCE' },
+  { name: 'Confident', emoji: '😎', color: colors.primary, coaching: 'REINFORCE' },
+];
 
 export default function VoiceScreen() {
   const { user } = useAuth();
-  const { refreshGoals } = useGoals();
-  const [isCallActive, setIsCallActive] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(false);
+  const { status, error, startCall, stopCall, isCallActive, isConnecting } = useMockVapi();
+  const [detectedEmotion, setDetectedEmotion] = useState<typeof EMOTIONS[0] | null>(null);
+  const [showWhatsAppUI, setShowWhatsAppUI] = useState(false);
+
+  // Mock emotion detection when call starts
+  useEffect(() => {
+    if (status === 'connected' && !detectedEmotion) {
+      // Simulate emotion detection after 2 seconds
+      setTimeout(() => {
+        const randomEmotion = EMOTIONS[Math.floor(Math.random() * EMOTIONS.length)];
+        setDetectedEmotion(randomEmotion);
+      }, 2000);
+    }
+  }, [status, detectedEmotion]);
+
+  // Handle call end - show WhatsApp UI
+  useEffect(() => {
+    if (status === 'disconnected' && detectedEmotion) {
+      setShowWhatsAppUI(true);
+      // Auto-hide after showing
+      setTimeout(() => {
+        Alert.alert(
+          'Session Complete! 🎉',
+          `Detected emotion: ${detectedEmotion.emoji} ${detectedEmotion.name}\n` +
+          `Coaching type: ${detectedEmotion.coaching}\n\n` +
+          `📱 WhatsApp summary sent (demo mode)`,
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                setDetectedEmotion(null);
+                setShowWhatsAppUI(false);
+              }
+            }
+          ]
+        );
+      }, 1000);
+    }
+  }, [status, detectedEmotion]);
+
+  // Handle errors
+  useEffect(() => {
+    if (error) {
+      Alert.alert('Error', error);
+      setDetectedEmotion(null);
+    }
+  }, [error]);
 
   const startVoiceCall = async () => {
     try {
-      setIsConnecting(true);
-
-      // TODO: Initialize Vapi SDK
-      // const vapi = new Vapi(process.env.EXPO_PUBLIC_VAPI_PUBLIC_KEY);
-      // await vapi.start({
-      //   assistantId: process.env.EXPO_PUBLIC_VAPI_ASSISTANT_ID,
-      //   metadata: {
-      //     userId: user?.id.toString(),
-      //     userName: user?.fullName,
-      //   },
-      // });
-
-      setIsCallActive(true);
-      setIsConnecting(false);
-
-      Alert.alert(
-        'Voice Integration',
-        'Vapi voice integration will be completed with your API keys. ' +
-        'For now, this is a placeholder UI.'
-      );
-    } catch (error) {
-      console.error('Failed to start voice call:', error);
-      Alert.alert('Error', 'Failed to start voice call');
-      setIsConnecting(false);
+      await startCall();
+    } catch (err) {
+      console.error('Failed to start voice call:', err);
     }
   };
 
-  const endVoiceCall = async () => {
+  const endVoiceCall = () => {
     try {
-      // TODO: Stop Vapi call
-      // vapi.stop();
-
-      setIsCallActive(false);
-
-      // Refresh goals after call ends
-      setTimeout(() => {
-        refreshGoals();
-      }, 2000);
-
-      Alert.alert('Session Ended', 'Your goals have been updated!');
-    } catch (error) {
-      console.error('Failed to end voice call:', error);
+      stopCall();
+    } catch (err) {
+      console.error('Failed to end voice call:', err);
     }
   };
 
@@ -72,7 +93,7 @@ export default function VoiceScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>Voice Coach</Text>
         <Text style={styles.subtitle}>
-          Talk about your goals and dreams
+          Your AI coach that listens to how you feel
         </Text>
       </View>
 
@@ -83,30 +104,41 @@ export default function VoiceScreen() {
             <View style={styles.instruction}>
               <Text style={styles.stepNumber}>1</Text>
               <Text style={styles.stepText}>
-                Tap the button to start a voice conversation
+                Tap the button to start your voice coaching session
               </Text>
             </View>
             <View style={styles.instruction}>
               <Text style={styles.stepNumber}>2</Text>
               <Text style={styles.stepText}>
-                Talk about your goals, dreams, and aspirations
+                Share how you're feeling - your stress, challenges, or victories
               </Text>
             </View>
             <View style={styles.instruction}>
               <Text style={styles.stepNumber}>3</Text>
               <Text style={styles.stepText}>
-                Your goals will be automatically extracted and saved
+                AI analyzes your emotional tone and energy level
               </Text>
             </View>
             <View style={styles.instruction}>
               <Text style={styles.stepNumber}>4</Text>
               <Text style={styles.stepText}>
-                Get a summary via WhatsApp when you're done
+                Get personalized coaching (PUSH, CALM, or REFRAME)
               </Text>
             </View>
           </View>
         ) : (
           <View style={styles.activeCallContainer}>
+            {detectedEmotion && (
+              <View style={[styles.emotionBadge, { backgroundColor: detectedEmotion.color + '20' }]}>
+                <Text style={styles.emotionEmoji}>{detectedEmotion.emoji}</Text>
+                <Text style={[styles.emotionText, { color: detectedEmotion.color }]}>
+                  {detectedEmotion.name}
+                </Text>
+                <Text style={styles.coachingType}>
+                  Coaching: {detectedEmotion.coaching}
+                </Text>
+              </View>
+            )}
             <View style={styles.waveformContainer}>
               <View style={styles.waveformBar} />
               <View style={[styles.waveformBar, styles.waveformBarTall]} />
@@ -114,9 +146,11 @@ export default function VoiceScreen() {
               <View style={[styles.waveformBar, styles.waveformBarTall]} />
               <View style={styles.waveformBar} />
             </View>
-            <Text style={styles.callStatus}>Listening...</Text>
+            <Text style={styles.callStatus}>
+              {detectedEmotion ? 'AI Coach Responding...' : 'Listening to your tone...'}
+            </Text>
             <Text style={styles.callHint}>
-              Speak naturally about your goals
+              Speak naturally about how you're feeling
             </Text>
           </View>
         )}
@@ -223,6 +257,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 24,
+  },
+  emotionBadge: {
+    backgroundColor: colors.primary + '20',
+    borderRadius: 20,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    gap: 8,
+    minWidth: 200,
+  },
+  emotionEmoji: {
+    fontSize: 48,
+  },
+  emotionText: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: colors.primary,
+  },
+  coachingType: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    fontWeight: '500',
   },
   waveformContainer: {
     flexDirection: 'row',

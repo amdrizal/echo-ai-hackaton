@@ -5,12 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userToResponse = exports.verifyPassword = exports.findUserById = exports.findUserByEmail = exports.createUser = void 0;
 const database_1 = require("../config/database");
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const createUser = async (input) => {
     const { email, password, fullName, phoneNumber } = input;
     // Hash password
     const saltRounds = 10;
-    const password_hash = await bcrypt_1.default.hash(password, saltRounds);
+    const password_hash = await bcryptjs_1.default.hash(password, saltRounds);
     const result = await (0, database_1.query)(`INSERT INTO users (email, password_hash, full_name, phone_number)
      VALUES ($1, $2, $3, $4)
      RETURNING id, email, password_hash, full_name, phone_number, created_at, updated_at`, [email, password_hash, fullName, phoneNumber || null]);
@@ -28,7 +28,7 @@ const findUserById = async (id) => {
 };
 exports.findUserById = findUserById;
 const verifyPassword = async (password, hash) => {
-    return bcrypt_1.default.compare(password, hash);
+    return bcryptjs_1.default.compare(password, hash);
 };
 exports.verifyPassword = verifyPassword;
 const userToResponse = (user) => {

@@ -11,7 +11,8 @@
     "postinstall": "npm run build",
     "test": "jest",
     "db:migrate": "node scripts/migrate.js",
-    "db:init": "node init-db.js"
+    "db:init": "node init-db.js",
+    "network-ip": "node scripts/get-network-ip.js"
   },
   "engines": {
     "node": ">=18.0.0",

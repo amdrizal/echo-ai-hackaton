@@ -139,10 +139,10 @@ export default function HistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.backgroundSecondary,
+    backgroundColor: colors.background, // Dark teal background
   },
   header: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundSecondary, // Secondary teal
     paddingHorizontal: 20,
     paddingTop: 60,
     paddingBottom: 20,
@@ -155,11 +155,11 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: colors.textPrimary,
+    color: colors.textPrimary, // White text
   },
   subtitle: {
     fontSize: 16,
-    color: colors.textSecondary,
+    color: colors.textSecondary, // Muted cyan-gray
     marginTop: 4,
   },
   statsContainer: {
@@ -168,18 +168,18 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: colors.primary,
+    color: colors.primary, // Bright cyan
   },
   statLabel: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: colors.textSecondary, // Muted cyan-gray
   },
   listContent: {
     padding: 16,
     gap: 12,
   },
   sessionCard: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundSecondary, // Secondary teal
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
@@ -198,6 +198,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 16,
     gap: 6,
+    // Background color applied dynamically
   },
   emotionEmoji: {
     fontSize: 20,
@@ -205,22 +206,23 @@ const styles = StyleSheet.create({
   emotionText: {
     fontSize: 14,
     fontWeight: '600',
+    // Color applied dynamically
   },
   sessionMeta: {
     alignItems: 'flex-end',
   },
   timeText: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: colors.textSecondary, // Muted cyan-gray
   },
   durationText: {
     fontSize: 10,
-    color: colors.textTertiary,
+    color: colors.textTertiary, // Darker muted
     marginTop: 2,
   },
   summaryText: {
     fontSize: 14,
-    color: colors.textPrimary,
+    color: colors.textPrimary, // White text
     lineHeight: 20,
   },
   sessionFooter: {
@@ -234,15 +236,15 @@ const styles = StyleSheet.create({
   },
   coachingLabel: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: colors.textSecondary, // Muted cyan-gray
   },
   coachingType: {
     fontSize: 12,
     fontWeight: '600',
-    color: colors.primary,
+    color: colors.primary, // Bright cyan
   },
   whatsappSent: {
     fontSize: 11,
-    color: colors.success,
+    color: colors.success, // Cyan success color
   },
 });

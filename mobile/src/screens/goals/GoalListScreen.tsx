@@ -125,10 +125,10 @@ export default function GoalListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.backgroundSecondary,
+    backgroundColor: colors.background, // Dark teal background
   },
   header: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundSecondary, // Secondary teal
     paddingHorizontal: 20,
     paddingTop: 60,
     paddingBottom: 20,
@@ -138,11 +138,11 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: colors.textPrimary,
+    color: colors.textPrimary, // White text
   },
   subtitle: {
     fontSize: 16,
-    color: colors.textSecondary,
+    color: colors.textSecondary, // Muted cyan-gray
     marginTop: 4,
   },
   listContent: {
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   goalCard: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundSecondary, // Secondary teal
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
@@ -166,25 +166,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
+    backgroundColor: 'rgba(0, 217, 192, 0.15)', // Subtle cyan background
   },
   categoryText: {
     fontSize: 12,
     fontWeight: '600',
     textTransform: 'capitalize',
+    // Color set dynamically based on category
   },
   voiceIndicator: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: colors.textSecondary, // Muted cyan-gray
   },
   goalTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.textPrimary, // White text
     marginBottom: 8,
   },
   goalDescription: {
     fontSize: 14,
-    color: colors.textSecondary,
+    color: colors.textSecondary, // Muted cyan-gray
     lineHeight: 20,
     marginBottom: 12,
   },
@@ -205,7 +207,7 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 12,
-    color: colors.textTertiary,
+    color: colors.textTertiary, // Darker muted text
   },
   loadingContainer: {
     flex: 1,
@@ -222,12 +224,12 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.textPrimary, // White text
     marginBottom: 8,
   },
   emptyText: {
     fontSize: 14,
-    color: colors.textSecondary,
+    color: colors.textSecondary, // Muted cyan-gray
     textAlign: 'center',
     lineHeight: 20,
   },

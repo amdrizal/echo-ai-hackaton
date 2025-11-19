@@ -43,6 +43,7 @@ export default function LoginScreen({ navigation }: any) {
           <TextInput
             style={styles.input}
             placeholder="Email"
+            placeholderTextColor={colors.textTertiary}
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
@@ -53,6 +54,7 @@ export default function LoginScreen({ navigation }: any) {
           <TextInput
             style={styles.input}
             placeholder="Password"
+            placeholderTextColor={colors.textTertiary}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -65,7 +67,7 @@ export default function LoginScreen({ navigation }: any) {
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color={colors.white} />
+              <ActivityIndicator color={colors.background} />
             ) : (
               <Text style={styles.buttonText}>Log In</Text>
             )}
@@ -88,7 +90,7 @@ export default function LoginScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.background, // Dark teal background
   },
   content: {
     flex: 1,
@@ -98,13 +100,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: colors.primary,
+    color: colors.textPrimary, // White text
     textAlign: 'center',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 18,
-    color: colors.textSecondary,
+    color: colors.textSecondary, // Muted cyan-gray
     textAlign: 'center',
     marginBottom: 48,
   },
@@ -114,16 +116,17 @@ const styles = StyleSheet.create({
   input: {
     height: 50,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.inputBorder, // Subtle border
     borderRadius: 8,
     paddingHorizontal: 16,
     fontSize: 16,
-    backgroundColor: colors.white,
+    backgroundColor: colors.inputBackground, // Subtle background
+    color: colors.textPrimary, // White text
   },
   button: {
     height: 50,
-    backgroundColor: colors.primary,
-    borderRadius: 8,
+    backgroundColor: colors.primary, // Bright cyan
+    borderRadius: 28, // Pill shape
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 8,
@@ -132,12 +135,12 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   buttonText: {
-    color: colors.white,
+    color: colors.background, // Dark teal text on cyan button
     fontSize: 16,
     fontWeight: '600',
   },
   link: {
-    color: colors.primary,
+    color: colors.primary, // Bright cyan
     textAlign: 'center',
     fontSize: 14,
     marginTop: 8,

@@ -142,10 +142,10 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.backgroundSecondary,
+    backgroundColor: colors.background, // Dark teal background
   },
   header: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundSecondary, // Secondary teal
     paddingHorizontal: 20,
     paddingTop: 60,
     paddingBottom: 20,
@@ -155,14 +155,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: colors.textPrimary,
+    color: colors.textPrimary, // White text
   },
   content: {
     padding: 16,
     gap: 16,
   },
   card: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundSecondary, // Secondary teal
     borderRadius: 12,
     padding: 20,
     borderWidth: 1,
@@ -176,35 +176,35 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primary, // Bright cyan
     justifyContent: 'center',
     alignItems: 'center',
   },
   avatarText: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: colors.white,
+    color: colors.background, // Dark text on cyan
   },
   userName: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: colors.textPrimary,
+    color: colors.textPrimary, // White text
     textAlign: 'center',
   },
   userEmail: {
     fontSize: 14,
-    color: colors.textSecondary,
+    color: colors.textSecondary, // Muted cyan-gray
     textAlign: 'center',
     marginTop: 4,
   },
   userPhone: {
     fontSize: 14,
-    color: colors.textTertiary,
+    color: colors.textTertiary, // Darker muted
     textAlign: 'center',
     marginTop: 4,
   },
   statsCard: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundSecondary, // Secondary teal
     borderRadius: 12,
     padding: 20,
     borderWidth: 1,
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.textPrimary, // White text
     marginBottom: 16,
   },
   statsGrid: {
@@ -226,17 +226,17 @@ const styles = StyleSheet.create({
     minWidth: '45%',
     alignItems: 'center',
     padding: 12,
-    backgroundColor: colors.backgroundSecondary,
+    backgroundColor: colors.backgroundTertiary, // Tertiary teal
     borderRadius: 8,
   },
   statValue: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: colors.textPrimary,
+    color: colors.textPrimary, // White text (color applied inline for success/primary)
   },
   statLabel: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: colors.textSecondary, // Muted cyan-gray
     marginTop: 4,
   },
   menuItem: {
@@ -249,27 +249,27 @@ const styles = StyleSheet.create({
   },
   menuItemText: {
     fontSize: 16,
-    color: colors.textPrimary,
+    color: colors.textPrimary, // White text
   },
   menuItemArrow: {
     fontSize: 24,
-    color: colors.textTertiary,
+    color: colors.textTertiary, // Darker muted
   },
   logoutButton: {
-    backgroundColor: colors.error,
-    borderRadius: 8,
+    backgroundColor: colors.error, // Red error color
+    borderRadius: 28, // Pill shape
     paddingVertical: 14,
     alignItems: 'center',
     marginTop: 8,
   },
   logoutButtonText: {
-    color: colors.white,
+    color: colors.white, // White text
     fontSize: 16,
     fontWeight: '600',
   },
   version: {
     textAlign: 'center',
-    color: colors.textTertiary,
+    color: colors.textTertiary, // Darker muted
     fontSize: 12,
     marginTop: 8,
   },

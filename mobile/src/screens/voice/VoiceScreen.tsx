@@ -167,10 +167,10 @@ export default function VoiceScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.backgroundSecondary,
+    backgroundColor: colors.background, // Dark teal background
   },
   header: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundSecondary, // Secondary teal
     paddingHorizontal: 20,
     paddingTop: 60,
     paddingBottom: 20,
@@ -180,11 +180,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: colors.textPrimary,
+    color: colors.textPrimary, // White text
   },
   subtitle: {
     fontSize: 16,
-    color: colors.textSecondary,
+    color: colors.textSecondary, // Muted cyan-gray
     marginTop: 4,
   },
   content: {
@@ -193,15 +193,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   instructionsContainer: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundSecondary, // Secondary teal
     borderRadius: 16,
     padding: 24,
     gap: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   instructionsTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.textPrimary, // White text
     marginBottom: 8,
   },
   instruction: {
@@ -212,8 +214,8 @@ const styles = StyleSheet.create({
   stepNumber: {
     width: 32,
     height: 32,
-    backgroundColor: colors.primaryLight,
-    color: colors.white,
+    backgroundColor: colors.primary, // Cyan accent
+    color: colors.background, // Dark text on cyan
     borderRadius: 16,
     textAlign: 'center',
     lineHeight: 32,
@@ -223,7 +225,7 @@ const styles = StyleSheet.create({
   stepText: {
     flex: 1,
     fontSize: 14,
-    color: colors.textSecondary,
+    color: colors.textSecondary, // Muted cyan-gray
     lineHeight: 20,
     paddingTop: 6,
   },
@@ -234,13 +236,15 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   emotionBadge: {
-    backgroundColor: colors.primary + '20',
+    backgroundColor: colors.backgroundSecondary, // Secondary teal
     borderRadius: 20,
     paddingVertical: 16,
     paddingHorizontal: 24,
     alignItems: 'center',
     gap: 8,
     minWidth: 200,
+    borderWidth: 2,
+    borderColor: colors.primary, // Cyan border
   },
   emotionEmoji: {
     fontSize: 48,
@@ -248,11 +252,11 @@ const styles = StyleSheet.create({
   emotionText: {
     fontSize: 20,
     fontWeight: '600',
-    color: colors.primary,
+    color: colors.primary, // Cyan text
   },
   coachingType: {
     fontSize: 14,
-    color: colors.textSecondary,
+    color: colors.textSecondary, // Muted cyan-gray
     fontWeight: '500',
   },
   waveformContainer: {
@@ -264,7 +268,7 @@ const styles = StyleSheet.create({
   waveformBar: {
     width: 8,
     height: 40,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primary, // Cyan bars
     borderRadius: 4,
   },
   waveformBarTall: {
@@ -273,15 +277,15 @@ const styles = StyleSheet.create({
   callStatus: {
     fontSize: 24,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.textPrimary, // White text
   },
   callHint: {
     fontSize: 14,
-    color: colors.textSecondary,
+    color: colors.textSecondary, // Muted cyan-gray
   },
   mainButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 20,
+    backgroundColor: colors.primary, // Bright cyan
+    borderRadius: 28, // Pill shape
     paddingVertical: 20,
     paddingHorizontal: 32,
     alignItems: 'center',
@@ -293,7 +297,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   mainButtonActive: {
-    backgroundColor: colors.error,
+    backgroundColor: colors.error, // Red for end session
   },
   mainButtonDisabled: {
     opacity: 0.6,
@@ -302,18 +306,18 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: colors.white + '30',
+    backgroundColor: colors.backgroundSecondary, // Dark teal circle
     justifyContent: 'center',
     alignItems: 'center',
   },
   micIconActive: {
-    backgroundColor: colors.white + '40',
+    backgroundColor: colors.backgroundTertiary, // Lighter teal when active
   },
   micEmoji: {
     fontSize: 32,
   },
   mainButtonText: {
-    color: colors.white,
+    color: colors.background, // Dark text on cyan button
     fontSize: 18,
     fontWeight: '600',
   },

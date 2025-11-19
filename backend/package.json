@@ -7,8 +7,15 @@
     "dev": "nodemon src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
+    "start:ts": "ts-node src/server.ts",
+    "postinstall": "npm run build",
     "test": "jest",
-    "db:migrate": "node scripts/migrate.js"
+    "db:migrate": "node scripts/migrate.js",
+    "db:init": "node init-db.js"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   },
   "keywords": ["voice", "ai", "coaching", "goals"],
   "author": "",

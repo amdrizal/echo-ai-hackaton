@@ -5,45 +5,63 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-  ActivityIndicator,
+  Animated,
 } from 'react-native';
 import { colors } from '../../theme/colors';
 import { useAuth } from '../../contexts/AuthContext';
 import { useVapi } from '../../hooks/useVapi';
+import { BeatingHeart } from '../../components/BeatingHeart';
 
 export default function VoiceScreen() {
   const { user } = useAuth();
-  const { status, error, startCall, stopCall, isCallActive, isConnecting, detectedEmotion } = useVapi();
-  const [showWhatsAppUI, setShowWhatsAppUI] = useState(false);
+  const { status, error, startCall, stopCall, isCallActive, isConnecting } = useVapi();
+  const [recordingTime, setRecordingTime] = useState(0);
+  const pulseAnim = React.useRef(new Animated.Value(1)).current;
 
-  // Handle call end - show WhatsApp UI
+  // Timer for recording duration
   useEffect(() => {
-    if (status === 'disconnected' && detectedEmotion) {
-      setShowWhatsAppUI(true);
-      // Auto-hide after showing
-      setTimeout(() => {
-        Alert.alert(
-          'Session Complete! 🎉',
-          `Detected emotion: ${detectedEmotion.emoji} ${detectedEmotion.name}\n` +
-          `Coaching type: ${detectedEmotion.coaching}\n\n` +
-          `📱 WhatsApp summary sent (demo mode)`,
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                setShowWhatsAppUI(false);
-              }
-            }
-          ]
-        );
+    let interval: NodeJS.Timeout;
+
+    if (isCallActive) {
+      setRecordingTime(0);
+      interval = setInterval(() => {
+        setRecordingTime((prev) => prev + 1);
       }, 1000);
+    } else {
+      setRecordingTime(0);
     }
-  }, [status, detectedEmotion]);
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isCallActive]);
+
+  // Pulse animation for mic button when connecting
+  useEffect(() => {
+    if (isConnecting) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, {
+            toValue: 1.1,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulseAnim, {
+            toValue: 1,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    } else {
+      pulseAnim.setValue(1);
+    }
+  }, [isConnecting, pulseAnim]);
 
   // Handle errors
   useEffect(() => {
     if (error) {
-      Alert.alert('Error', error);
+      Alert.alert('Voice Error', error);
     }
   }, [error]);
 
@@ -58,107 +76,115 @@ export default function VoiceScreen() {
   const endVoiceCall = () => {
     try {
       stopCall();
+      Alert.alert(
+        'Session Complete! 🎉',
+        'Your coaching session has ended.\n\n📱 Check WhatsApp for a summary (demo mode)',
+        [{ text: 'OK' }]
+      );
     } catch (err) {
       console.error('Failed to end voice call:', err);
     }
   };
 
+  const handleSkipToText = () => {
+    Alert.alert(
+      'Skip to Text',
+      'This feature allows you to type your thoughts instead of speaking. Coming soon!',
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleHistory = () => {
+    Alert.alert(
+      'History',
+      'View your previous emotion check-ins and coaching sessions. Coming soon!',
+      [{ text: 'OK' }]
+    );
+  };
+
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
   return (
     <View style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Voice Coach</Text>
-        <Text style={styles.subtitle}>
-          Your AI coach that listens to how you feel
-        </Text>
+        <Text style={styles.title}>Emotion Check-In</Text>
+
+        {/* Status Badge */}
+        <View style={styles.statusBadge}>
+          <View style={styles.statusDot} />
+          <Text style={styles.statusText}>I'm here for you</Text>
+        </View>
       </View>
 
+      {/* Main Content */}
       <View style={styles.content}>
-        {!isCallActive ? (
-          <View style={styles.instructionsContainer}>
-            <Text style={styles.instructionsTitle}>How it works:</Text>
-            <View style={styles.instruction}>
-              <Text style={styles.stepNumber}>1</Text>
-              <Text style={styles.stepText}>
-                Tap the button to start your voice coaching session
-              </Text>
-            </View>
-            <View style={styles.instruction}>
-              <Text style={styles.stepNumber}>2</Text>
-              <Text style={styles.stepText}>
-                Share how you're feeling - your stress, challenges, or victories
-              </Text>
-            </View>
-            <View style={styles.instruction}>
-              <Text style={styles.stepNumber}>3</Text>
-              <Text style={styles.stepText}>
-                AI analyzes your emotional tone and energy level
-              </Text>
-            </View>
-            <View style={styles.instruction}>
-              <Text style={styles.stepNumber}>4</Text>
-              <Text style={styles.stepText}>
-                Get personalized coaching (PUSH, CALM, or REFRAME)
-              </Text>
-            </View>
-          </View>
-        ) : (
-          <View style={styles.activeCallContainer}>
-            {detectedEmotion && (
-              <View style={[styles.emotionBadge, { backgroundColor: detectedEmotion.color + '20' }]}>
-                <Text style={styles.emotionEmoji}>{detectedEmotion.emoji}</Text>
-                <Text style={[styles.emotionText, { color: detectedEmotion.color }]}>
-                  {detectedEmotion.name}
-                </Text>
-                <Text style={styles.coachingType}>
-                  Coaching: {detectedEmotion.coaching}
-                </Text>
-              </View>
-            )}
-            <View style={styles.waveformContainer}>
-              <View style={styles.waveformBar} />
-              <View style={[styles.waveformBar, styles.waveformBarTall]} />
-              <View style={styles.waveformBar} />
-              <View style={[styles.waveformBar, styles.waveformBarTall]} />
-              <View style={styles.waveformBar} />
-            </View>
-            <Text style={styles.callStatus}>
-              {detectedEmotion ? 'AI Coach Responding...' : 'Listening to your tone...'}
-            </Text>
-            <Text style={styles.callHint}>
-              Speak naturally about how you're feeling
-            </Text>
-          </View>
-        )}
+        {/* Main Heading */}
+        <View style={styles.headingContainer}>
+          <Text style={styles.mainHeading}>
+            Tell me what's on{'\n'}your mind...
+          </Text>
+          <Text style={styles.privacyText}>
+            Your thoughts remain private and used{'\n'}only in the moment:
+          </Text>
+        </View>
 
-        <TouchableOpacity
-          style={[
-            styles.mainButton,
-            isCallActive && styles.mainButtonActive,
-            isConnecting && styles.mainButtonDisabled,
-          ]}
-          onPress={isCallActive ? endVoiceCall : startVoiceCall}
-          disabled={isConnecting}
-        >
-          {isConnecting ? (
-            <ActivityIndicator color={colors.white} size="large" />
-          ) : (
-            <>
-              <View
-                style={[
-                  styles.micIcon,
-                  isCallActive && styles.micIconActive,
-                ]}
-              >
-                <Text style={styles.micEmoji}>
-                  {isCallActive ? '⏹' : '🎤'}
-                </Text>
-              </View>
-              <Text style={styles.mainButtonText}>
-                {isCallActive ? 'End Session' : 'Start Coaching'}
-              </Text>
-            </>
-          )}
-        </TouchableOpacity>
+        {/* Heart Circle with Timer */}
+        <View style={styles.heartContainer}>
+          <View style={styles.heartCircle}>
+            <BeatingHeart isBeating={isCallActive} size={100} />
+            {isCallActive && (
+              <Text style={styles.timerText}>{formatTime(recordingTime)}</Text>
+            )}
+            {!isCallActive && (
+              <Text style={styles.timerText}>00:00</Text>
+            )}
+          </View>
+        </View>
+
+        {/* Best Results Text */}
+        <Text style={styles.bestResultsText}>
+          Best results between 20-60 second
+        </Text>
+
+        {/* Microphone Button */}
+        <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+          <TouchableOpacity
+            style={[
+              styles.micButton,
+              isCallActive && styles.micButtonActive,
+            ]}
+            onPress={isCallActive ? endVoiceCall : startVoiceCall}
+            disabled={isConnecting}
+          >
+            <Text style={styles.micIcon}>
+              {isCallActive ? '⏹' : '🎤'}
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
+
+        {/* Bottom Actions */}
+        <View style={styles.bottomActions}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={handleHistory}
+          >
+            <Text style={styles.actionIcon}>🕒</Text>
+            <Text style={styles.actionText}>History</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={handleSkipToText}
+          >
+            <Text style={styles.actionIcon}>✏️</Text>
+            <Text style={styles.actionText}>Skip to text</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -167,158 +193,130 @@ export default function VoiceScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background, // Dark teal background
+    backgroundColor: colors.background,
   },
   header: {
-    backgroundColor: colors.backgroundSecondary, // Secondary teal
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingTop: 60,
-    paddingBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    paddingBottom: 24,
+    alignItems: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: colors.textPrimary, // White text
+    color: colors.textPrimary,
+    marginBottom: 16,
   },
-  subtitle: {
-    fontSize: 16,
-    color: colors.textSecondary, // Muted cyan-gray
-    marginTop: 4,
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.backgroundSecondary,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 24,
+    gap: 8,
+  },
+  statusDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: colors.primary,
+  },
+  statusText: {
+    color: colors.textPrimary,
+    fontSize: 15,
+    fontWeight: '500',
   },
   content: {
     flex: 1,
-    padding: 24,
-    justifyContent: 'space-between',
-  },
-  instructionsContainer: {
-    backgroundColor: colors.backgroundSecondary, // Secondary teal
-    borderRadius: 16,
-    padding: 24,
-    gap: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  instructionsTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.textPrimary, // White text
-    marginBottom: 8,
-  },
-  instruction: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 16,
-  },
-  stepNumber: {
-    width: 32,
-    height: 32,
-    backgroundColor: colors.primary, // Cyan accent
-    color: colors.background, // Dark text on cyan
-    borderRadius: 16,
-    textAlign: 'center',
-    lineHeight: 32,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  stepText: {
-    flex: 1,
-    fontSize: 14,
-    color: colors.textSecondary, // Muted cyan-gray
-    lineHeight: 20,
-    paddingTop: 6,
-  },
-  activeCallContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 24,
-  },
-  emotionBadge: {
-    backgroundColor: colors.backgroundSecondary, // Secondary teal
-    borderRadius: 20,
-    paddingVertical: 16,
     paddingHorizontal: 24,
     alignItems: 'center',
-    gap: 8,
-    minWidth: 200,
+    justifyContent: 'space-between',
+    paddingBottom: 40,
+  },
+  headingContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  mainHeading: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: colors.textPrimary,
+    textAlign: 'center',
+    lineHeight: 40,
+    marginBottom: 16,
+  },
+  privacyText: {
+    fontSize: 15,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  heartContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 20,
+  },
+  heartCircle: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
     borderWidth: 2,
-    borderColor: colors.primary, // Cyan border
+    borderColor: colors.primary + '40',
+    backgroundColor: colors.backgroundSecondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
   },
-  emotionEmoji: {
-    fontSize: 48,
-  },
-  emotionText: {
+  timerText: {
+    position: 'absolute',
+    bottom: 30,
     fontSize: 20,
     fontWeight: '600',
-    color: colors.primary, // Cyan text
+    color: colors.textPrimary,
   },
-  coachingType: {
+  bestResultsText: {
     fontSize: 14,
-    color: colors.textSecondary, // Muted cyan-gray
-    fontWeight: '500',
+    color: colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: 20,
   },
-  waveformContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  micButton: {
+    width: 80,
     height: 80,
-  },
-  waveformBar: {
-    width: 8,
-    height: 40,
-    backgroundColor: colors.primary, // Cyan bars
-    borderRadius: 4,
-  },
-  waveformBarTall: {
-    height: 60,
-  },
-  callStatus: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: colors.textPrimary, // White text
-  },
-  callHint: {
-    fontSize: 14,
-    color: colors.textSecondary, // Muted cyan-gray
-  },
-  mainButton: {
-    backgroundColor: colors.primary, // Bright cyan
-    borderRadius: 28, // Pill shape
-    paddingVertical: 20,
-    paddingHorizontal: 32,
+    borderRadius: 40,
+    backgroundColor: colors.primary,
     alignItems: 'center',
-    gap: 12,
+    justifyContent: 'center',
     shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
   },
-  mainButtonActive: {
-    backgroundColor: colors.error, // Red for end session
-  },
-  mainButtonDisabled: {
-    opacity: 0.6,
+  micButtonActive: {
+    backgroundColor: colors.error,
+    shadowColor: colors.error,
   },
   micIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: colors.backgroundSecondary, // Dark teal circle
-    justifyContent: 'center',
+    fontSize: 36,
+  },
+  bottomActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginTop: 30,
+  },
+  actionButton: {
     alignItems: 'center',
+    gap: 4,
   },
-  micIconActive: {
-    backgroundColor: colors.backgroundTertiary, // Lighter teal when active
+  actionIcon: {
+    fontSize: 24,
   },
-  micEmoji: {
-    fontSize: 32,
-  },
-  mainButtonText: {
-    color: colors.background, // Dark text on cyan button
-    fontSize: 18,
-    fontWeight: '600',
+  actionText: {
+    fontSize: 14,
+    color: colors.textPrimary,
+    fontWeight: '500',
   },
 });

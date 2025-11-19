@@ -1,0 +1,62 @@
+# Workflow Status Template
+
+# This tracks progress through BMM methodology Analysis, Planning, and Solutioning phases.
+# Implementation phase is tracked separately in sprint-status.yaml
+
+# STATUS DEFINITIONS:
+# ==================
+# Initial Status (before completion):
+#   - required: Must be completed to progress
+#   - optional: Can be completed but not required
+#   - recommended: Strongly suggested but not required
+#   - conditional: Required only if certain conditions met (e.g., if_has_ui)
+#
+# Completion Status:
+#   - {file-path}: File created/found (e.g., "docs/product-brief.md")
+#   - skipped: Optional/conditional workflow that was skipped
+
+generated: "2025-11-19"
+project: "echo-ai"
+project_type: "voice-ai-mvp"
+selected_track: "quick-flow"
+field_type: "greenfield"
+workflow_path: ".bmad/bmm/workflows/workflow-status/paths/quick-flow-greenfield.yaml"
+
+workflow_status:
+  - phase: 0
+    name: "Discovery (Optional)"
+    status: skipped
+    workflows:
+      - id: brainstorm-project
+        status: skipped
+        agent: analyst
+        command: brainstorm-project
+        optional: true
+
+      - id: research
+        status: skipped
+        agent: analyst
+        command: research
+        optional: true
+
+  - phase: 1
+    name: "Planning"
+    status: completed
+    workflows:
+      - id: tech-spec
+        status: "docs/hackathon/specs/technical-specification.md"
+        agent: pm
+        command: tech-spec
+        required: true
+        output: "Technical Specification with stories (auto-detects epic if 2+ stories)"
+
+  - phase: 2
+    name: "Implementation"
+    status: required
+    workflows:
+      - id: sprint-planning
+        status: required
+        agent: sm
+        command: sprint-planning
+        required: true
+        note: "Creates sprint plan with all stories - subsequent work tracked in sprint plan output, not workflow-status"

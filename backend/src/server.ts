@@ -15,9 +15,27 @@ const app: Application = express();
 const PORT = process.env.PORT || 3000;
 const API_VERSION = process.env.API_VERSION || 'v1';
 
-// Middleware
+// Middleware - CORS configuration
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',')
+  : [
+      'http://localhost:8081',
+      'http://localhost:19006',
+      'https://echo-ai-ez47.onrender.com',
+    ];
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN?.split(',') || '*',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+
+    // Check if origin is in allowed list or use wildcard for development
+    if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 app.use(morgan('dev'));
@@ -51,11 +69,16 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📡 API endpoint: http://localhost:${PORT}/api/${API_VERSION}`);
+// Start server - Listen on 0.0.0.0 to allow connections from devices on local network
+const HOST = process.env.HOST || '0.0.0.0';
+
+app.listen(Number(PORT), HOST, () => {
+  console.log(`🚀 Server running on ${HOST}:${PORT}`);
+  console.log(`📡 Local API: http://localhost:${PORT}/api/${API_VERSION}`);
   console.log(`🏥 Health check: http://localhost:${PORT}/health`);
+  console.log(`\n📱 For mobile devices on local network:`);
+  console.log(`   Run: npm run network-ip`);
+  console.log(`   Then update mobile/.env with: EXPO_PUBLIC_API_URL=http://<YOUR_IP>:${PORT}/api/${API_VERSION}`);
 });
 
 export default app;

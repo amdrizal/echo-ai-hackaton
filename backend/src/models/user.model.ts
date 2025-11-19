@@ -1,5 +1,5 @@
 import { query } from '../config/database';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 export interface User {
   id: number;

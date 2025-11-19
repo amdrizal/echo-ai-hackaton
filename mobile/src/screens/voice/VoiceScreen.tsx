@@ -6,7 +6,11 @@ import {
   StyleSheet,
   Alert,
   Animated,
+  ScrollView,
+  Dimensions,
 } from 'react-native';
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 import { colors } from '../../theme/colors';
 import { useAuth } from '../../contexts/AuthContext';
 import { useVapi } from '../../hooks/useVapi';
@@ -14,9 +18,10 @@ import { BeatingHeart } from '../../components/BeatingHeart';
 
 export default function VoiceScreen() {
   const { user } = useAuth();
-  const { status, error, startCall, stopCall, isCallActive, isConnecting } = useVapi();
+  const { status, error, startCall, stopCall, isCallActive, isConnecting, detectedEmotion } = useVapi();
   const [recordingTime, setRecordingTime] = useState(0);
   const pulseAnim = React.useRef(new Animated.Value(1)).current;
+  const emotionSlideAnim = React.useRef(new Animated.Value(0)).current;
 
   // Timer for recording duration
   useEffect(() => {
@@ -57,6 +62,20 @@ export default function VoiceScreen() {
       pulseAnim.setValue(1);
     }
   }, [isConnecting, pulseAnim]);
+
+  // Slide in animation when emotion is detected
+  useEffect(() => {
+    if (detectedEmotion) {
+      Animated.spring(emotionSlideAnim, {
+        toValue: 1,
+        tension: 50,
+        friction: 7,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      emotionSlideAnim.setValue(0);
+    }
+  }, [detectedEmotion, emotionSlideAnim]);
 
   // Handle errors
   useEffect(() => {
@@ -121,17 +140,47 @@ export default function VoiceScreen() {
         </View>
       </View>
 
-      {/* Main Content */}
-      <View style={styles.content}>
-        {/* Main Heading */}
-        <View style={styles.headingContainer}>
-          <Text style={styles.mainHeading}>
-            Tell me what's on{'\n'}your mind...
-          </Text>
-          <Text style={styles.privacyText}>
-            Your thoughts remain private and used{'\n'}only in the moment:
-          </Text>
-        </View>
+      {/* Scrollable Content for Responsiveness */}
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Emotion Detection Card at Top */}
+        {detectedEmotion && (
+          <Animated.View
+            style={[
+              styles.emotionCardTop,
+              {
+                opacity: emotionSlideAnim,
+                transform: [
+                  {
+                    translateY: emotionSlideAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [-20, 0],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          >
+            <Text style={styles.emotionEmojiLarge}>{detectedEmotion.emoji}</Text>
+            <View style={styles.emotionInfoTop}>
+              <Text style={[styles.emotionNameLarge, { color: detectedEmotion.color }]}>
+                {detectedEmotion.name}
+              </Text>
+              <Text style={styles.coachingTypeTop}>
+                AI Response: {detectedEmotion.coaching}
+              </Text>
+              <View style={[styles.coachingBadgeLarge, { backgroundColor: detectedEmotion.color + '20' }]}>
+                <Text style={[styles.coachingBadgeTextLarge, { color: detectedEmotion.color }]}>
+                  {detectedEmotion.coaching === 'CALM' && '🧘 Calming approach'}
+                  {detectedEmotion.coaching === 'PUSH' && '💪 Motivational push'}
+                  {detectedEmotion.coaching === 'REINFORCE' && '✨ Positive reinforcement'}
+                </Text>
+              </View>
+            </View>
+          </Animated.View>
+        )}
 
         {/* Heart Circle with Timer */}
         <View style={styles.heartContainer}>
@@ -150,24 +199,10 @@ export default function VoiceScreen() {
         <Text style={styles.bestResultsText}>
           Best results between 20-60 second
         </Text>
+      </ScrollView>
 
-        {/* Microphone Button */}
-        <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
-          <TouchableOpacity
-            style={[
-              styles.micButton,
-              isCallActive && styles.micButtonActive,
-            ]}
-            onPress={isCallActive ? endVoiceCall : startVoiceCall}
-            disabled={isConnecting}
-          >
-            <Text style={styles.micIcon}>
-              {isCallActive ? '⏹' : '🎤'}
-            </Text>
-          </TouchableOpacity>
-        </Animated.View>
-
-        {/* Bottom Actions */}
+      {/* Fixed Bottom Action Bar */}
+      <View style={styles.actionsContainer}>
         <View style={styles.bottomActions}>
           <TouchableOpacity
             style={styles.actionButton}
@@ -176,6 +211,22 @@ export default function VoiceScreen() {
             <Text style={styles.actionIcon}>🕒</Text>
             <Text style={styles.actionText}>History</Text>
           </TouchableOpacity>
+
+          {/* Minimalist Microphone Button */}
+          <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+            <TouchableOpacity
+              style={[
+                styles.micButtonMinimal,
+                isCallActive && styles.micButtonMinimalActive,
+              ]}
+              onPress={isCallActive ? endVoiceCall : startVoiceCall}
+              disabled={isConnecting}
+            >
+              <Text style={styles.micIconMinimal}>
+                {isCallActive ? '⏹' : '🎤'}
+              </Text>
+            </TouchableOpacity>
+          </Animated.View>
 
           <TouchableOpacity
             style={styles.actionButton}
@@ -227,30 +278,14 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '500',
   },
-  content: {
-    flex: 1,
+  scrollContent: {
+    flexGrow: 1,
     paddingHorizontal: 24,
+    paddingTop: 20,
+    paddingBottom: 20,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingBottom: 40,
-  },
-  headingContainer: {
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  mainHeading: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: colors.textPrimary,
-    textAlign: 'center',
-    lineHeight: 40,
-    marginBottom: 16,
-  },
-  privacyText: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 22,
+    justifyContent: 'center',
+    minHeight: SCREEN_HEIGHT * 0.6, // Responsive height
   },
   heartContainer: {
     alignItems: 'center',
@@ -279,33 +314,88 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textSecondary,
     textAlign: 'center',
+    marginTop: 30,
     marginBottom: 20,
   },
-  micButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.primary,
+  // Emotion Card at Top Styles
+  emotionCardTop: {
+    backgroundColor: colors.backgroundSecondary,
+    borderRadius: 20,
+    padding: 24,
+    marginBottom: 30,
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 12,
+    width: '100%',
+    borderWidth: 2,
+    borderColor: colors.primary + '40',
     shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
-  micButtonActive: {
-    backgroundColor: colors.error,
-    shadowColor: colors.error,
+  emotionEmojiLarge: {
+    fontSize: 64,
   },
-  micIcon: {
-    fontSize: 36,
+  emotionInfoTop: {
+    alignItems: 'center',
+    gap: 8,
+    width: '100%',
+  },
+  emotionNameLarge: {
+    fontSize: 28,
+    fontWeight: 'bold',
+  },
+  coachingTypeTop: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    fontWeight: '500',
+  },
+  coachingBadgeLarge: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    marginTop: 4,
+  },
+  coachingBadgeTextLarge: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  // Actions Container - Fixed Bottom Bar
+  actionsContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: colors.background,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    paddingBottom: 30, // Extra padding for devices with notch/home indicator
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
   },
   bottomActions: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     width: '100%',
-    marginTop: 30,
+  },
+  // Minimalist Mic Button
+  micButtonMinimal: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 3,
+    borderColor: colors.background,
+  },
+  micButtonMinimalActive: {
+    backgroundColor: colors.error,
+  },
+  micIconMinimal: {
+    fontSize: 28,
   },
   actionButton: {
     alignItems: 'center',

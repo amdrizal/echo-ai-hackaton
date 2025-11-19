@@ -15,28 +15,9 @@ const app: Application = express();
 const PORT = process.env.PORT || 3000;
 const API_VERSION = process.env.API_VERSION || 'v1';
 
-// Middleware - CORS configuration
-const allowedOrigins = process.env.CORS_ORIGIN
-  ? process.env.CORS_ORIGIN.split(',')
-  : [
-      'http://localhost:8081',
-      'http://localhost:19006',
-      'https://echo-ai-ez47.onrender.com',
-    ];
-
+// Middleware - CORS configuration (allow all origins for hackathon/demo)
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl)
-    if (!origin) return callback(null, true);
-
-    // Check if origin is in allowed list or use wildcard for development
-    if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
-      callback(null, true);
-    } else {
-      // Block CORS but don't throw error (just return false)
-      callback(null, false);
-    }
-  },
+  origin: true, // Allow all origins
   credentials: true,
 }));
 app.use(morgan('dev'));
